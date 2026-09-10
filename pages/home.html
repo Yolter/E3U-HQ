@@ -1,68 +1,100 @@
-<section class="section-panel">
-  <div class="hero">
-    <div>
-      <h1>E3U Headquarters</h1>
-      <p>Управление составом, аттестацией, Truck, Банком, событиями и офицерами.</p>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E3U HQ</title>
+
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="layout">
+
+  <aside id="sidebar"></aside>
+
+  <main class="content">
+
+    <div class="topbar">
+      <div id="clock">Загрузка...</div>
     </div>
 
-    <div class="hero-badge">
-      👑 Founder
-    </div>
-  </div>
-
-  <h2>👑 Штаб Founder</h2>
-
-  <div class="stats-grid">
-    <div class="stat-card">
-      <span>Founder</span>
-      <h3 id="founderName">Yolter</h3>
+    <div class="hero">
+      <img src="../assets/images/hero3.jpg" alt="E3U HQ">
+      <div class="hero-overlay">
+        <h1>E3U HQ</h1>
+        <p>Founder Control Center</p>
+      </div>
     </div>
 
-    <div class="stat-card">
-      <span>Всего игроков</span>
-      <h3 id="playersCount">0</h3>
+    <div class="grid stats">
+
+      <div class="card">
+        <span>Founder</span>
+        <h2 id="founderName">Yolter</h2>
+      </div>
+
+      <div class="card">
+        <span>Всего игроков</span>
+        <h2 id="totalPlayers">0</h2>
+      </div>
+
+      <div class="card">
+        <span>R4+</span>
+        <h2 id="officerCount">0</h2>
+      </div>
+
+      <div class="card">
+        <span>Ждут аттестацию</span>
+        <h2 id="waitingCount">0</h2>
+      </div>
+
     </div>
 
-    <div class="stat-card">
-      <span>R4+</span>
-      <h3 id="officerCount">0</h3>
+    <div class="card">
+      <h2>⚡ Быстрые действия</h2>
+
+      <div class="quick-grid">
+        <button onclick="location.href='truck.html'">🚚 Truck</button>
+        <button onclick="location.href='bank.html'">🏦 Банк</button>
+        <button onclick="location.href='roster.html'">👥 Состав</button>
+        <button onclick="location.href='admin.html'">👑 Штаб</button>
+      </div>
     </div>
 
-    <div class="stat-card warning">
-      <span>Ждут аттестацию</span>
-      <h3 id="waitingCount">0</h3>
+    <div class="card">
+      <h2>📢 Последняя активность</h2>
+      <div id="recentActivity">
+        Пока активности нет.
+      </div>
     </div>
-  </div>
 
-  <button class="btn" id="quickAdd">
-    ➕ Добавить игрока
-  </button>
+  </main>
 
-  <div class="search-box">
-    <input id="searchPlayers" placeholder="Поиск игрока">
-  </div>
-
-  <div id="recentActivity"></div>
-</section>
+</div>
 
 <script type="module">
-import {db} from "../js/firebase.js";
+
+import { db } from "../js/firebase.js";
 import {
-  collection,
-  getDocs,
-  query,
-  orderBy,
-  limit
-} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+collection,
+getDocs,
+query,
+orderBy,
+limit
+} from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
 async function refreshHome(){
 
-  const users = await getDocs(collection(db,"users"));
+  let total = 0;
+  let officers = 0;
+  let waiting = 0;
 
-  let total=0;
-  let officers=0;
+  const players = await getDocs(collection(db,"players"));
 
-  users.forEach(doc=>{
+  players.forEach(doc=>{
+
     total++;
 
     const role=(doc.data().role||"").toUpperCase();
@@ -70,10 +102,18 @@ async function refreshHome(){
     if(role.startsWith("R4") || role==="FOUNDER"){
       officers++;
     }
+
+    if(doc.data().status==="waiting"){
+      waiting++;
+    }
+
   });
 
-  playersCount.textContent=total;
-  officerCount.textContent=officers;
+  document.getElementById("totalPlayers").textContent=total;
+  document.getElementById("officerCount").textContent=officers;
+  document.getElementById("waitingCount").textContent=waiting;
+
+  const recent=document.getElementById("recentActivity");
 
   const activityQ=query(
     collection(db,"activity"),
@@ -83,28 +123,53 @@ async function refreshHome(){
 
   const activity=await getDocs(activityQ);
 
-  recentActivity.innerHTML="";
+  recent.innerHTML="";
 
   activity.forEach(doc=>{
 
     const d=doc.data();
 
-    recentActivity.innerHTML+=`
+    recent.innerHTML+=`
       <div class="activity-item">
-        <div class="dot"></div>
-        <div>
-          <strong>${d.text}</strong><br>
-          <small>${d.role||""}</small>
-        </div>
+        <strong>${d.text || "Активность"}</strong><br>
+        <small>${d.role || ""}</small>
       </div>
     `;
+
   });
+
+  if(activity.empty){
+    recent.innerHTML="Пока активности нет.";
+  }
 
 }
 
-quickAdd.onclick=()=>{
-  document.querySelector('[data-page="staff"]').click();
-};
-
 refreshHome();
+
 </script>
+
+<script>
+function updateClock(){
+
+const now=new Date();
+
+document.getElementById("clock").textContent=
+now.toLocaleString("ru-RU",{
+weekday:"long",
+day:"numeric",
+month:"long",
+hour:"2-digit",
+minute:"2-digit",
+timeZone:"Europe/Madrid"
+});
+
+}
+
+updateClock();
+setInterval(updateClock,1000);
+</script>
+
+<script src="../js/router.js"></script>
+
+</body>
+</html>

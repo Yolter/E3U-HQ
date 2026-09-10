@@ -3,230 +3,326 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>E3U Headquarters</title>
-
-<link rel="stylesheet" href="css/layout.css">
-<link rel="stylesheet" href="css/style.css">
+<title>E3U HQ</title>
 
 <style>
-.hero{
-position:relative;
-height:340px;
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+background:#000;
+font-family:Arial,Helvetica,sans-serif;
+color:white;
 overflow:hidden;
-border-radius:24px;
-margin-bottom:24px;
-background:#111;
 }
 
-.hero::after{
-content:"";
-position:absolute;
+.slider{
+position:fixed;
 inset:0;
-background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.75));
+z-index:-2;
+background-size:cover;
+background-position:center;
+transition:background-image .8s ease-in-out;
 }
 
-.hero img{
-position:absolute;
-width:100%;
-height:100%;
-object-fit:cover;
-opacity:0;
-transition:opacity 1.8s ease;
-}
-
-.hero img.active{
-opacity:1;
-}
-
-.hero-content{
-position:absolute;
-left:40px;
-bottom:35px;
-z-index:2;
-}
-
-.hero h1{
-font-size:52px;
-margin:0;
-}
-
-.hero p{
-opacity:.85;
-margin-top:8px;
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.55);
+z-index:-1;
 }
 
 .topbar{
+position:absolute;
+top:25px;
+left:50%;
+transform:translateX(-50%);
+width:min(1200px,92%);
 display:flex;
 justify-content:space-between;
 align-items:center;
-margin-bottom:18px;
-flex-wrap:wrap;
-gap:10px;
 }
 
-.lang button{
-margin-left:6px;
+.logo{
+font-size:42px;
+font-weight:900;
+color:#f0c541;
+line-height:.9;
+}
+
+.logo span{
+display:block;
+font-size:18px;
+color:white;
+}
+
+.right{
+display:flex;
+align-items:center;
+gap:16px;
+}
+
+.langs button{
+background:#111;
+color:white;
+border:1px solid #333;
 padding:8px 12px;
-border:none;
-border-radius:10px;
-background:#222;
-color:#fff;
+border-radius:12px;
 cursor:pointer;
+font-weight:bold;
 }
 
-.lang button:hover{
+.langs button.active{
 background:#f0c541;
-color:#000;
+color:black;
 }
 
 .music{
 display:flex;
 align-items:center;
-gap:10px;
+gap:8px;
 }
 
 .music input{
 width:90px;
 }
 
-.quick{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-gap:14px;
-margin-top:20px;
-}
-
-.quick a{
-display:block;
+.center{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
 text-align:center;
-padding:14px;
-border-radius:16px;
-background:#f0c541;
-color:#000;
-font-weight:700;
-text-decoration:none;
-transition:.25s;
+padding:20px;
 }
 
-.quick a:hover{
-transform:translateY(-3px);
-box-shadow:0 0 20px rgba(240,197,65,.35);
+.hero{
+max-width:800px;
+}
+
+.hero h1{
+font-size:72px;
+margin-bottom:10px;
+}
+
+.hero p{
+font-size:22px;
+color:#ddd;
+margin-bottom:40px;
+}
+
+.login-btn{
+background:#f0c541;
+color:black;
+font-size:24px;
+font-weight:bold;
+padding:18px 50px;
+border:none;
+border-radius:18px;
+cursor:pointer;
+transition:.2s;
+}
+
+.login-btn:hover{
+transform:translateY(-2px);
+box-shadow:0 0 25px rgba(240,197,65,.5);
+}
+
+.time{
+position:absolute;
+bottom:30px;
+left:50%;
+transform:translateX(-50%);
+font-size:18px;
+color:#ddd;
+}
+
+.arrow{
+position:absolute;
+top:50%;
+transform:translateY(-50%);
+background:rgba(0,0,0,.5);
+border:none;
+color:white;
+font-size:34px;
+padding:12px 18px;
+cursor:pointer;
+border-radius:14px;
+}
+
+#prev{left:20px}
+#next{right:20px}
+
+@media(max-width:768px){
+
+.logo{font-size:34px}
+
+.hero h1{font-size:46px}
+
+.hero p{font-size:18px}
+
+.topbar{
+flex-direction:column;
+gap:15px;
+}
+
+.time{
+bottom:15px;
+font-size:15px;
+}
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="layout">
-
-<aside id="sidebar"></aside>
-
-<main class="content">
+<div class="slider" id="slider"></div>
+<div class="overlay"></div>
 
 <div class="topbar">
 
-<div id="clock"></div>
+<div class="logo">
+E3U
+<span>HQ</span>
+</div>
+
+<div class="right">
 
 <div class="music">
-<button id="musicBtn">🎵</button>
-<input type="range" id="volume" min="0" max="100" value="40">
+🎵
+<input id="volume" type="range" min="0" max="1" step="0.01">
 </div>
 
-<div class="lang">
-<button>RU</button>
-<button>EN</button>
-<button>ES</button>
-<button>JP</button>
+<div class="langs">
+<button class="lang active" data-lang="ru">RU</button>
+<button class="lang" data-lang="en">EN</button>
+<button class="lang" data-lang="es">ES</button>
+<button class="lang" data-lang="jp">JP</button>
 </div>
 
 </div>
+</div>
 
+<div class="center">
 <div class="hero">
+<h1 id="title">E3U HQ</h1>
+<p id="subtitle">Founder Control Center</p>
 
-<img class="active" src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1600" alt="">
-<img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1600" alt="">
-<img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=1600" alt="">
-
-<div class="hero-content">
-<h1>E3U HQ</h1>
-<p>Founder Control Center</p>
+<button class="login-btn" id="loginBtn"
+onclick="location.href='pages/home.html'">
+Войти в HQ
+</button>
+</div>
 </div>
 
-</div>
+<button class="arrow" id="prev">❮</button>
+<button class="arrow" id="next">❯</button>
 
-<div class="grid stats">
+<div class="time" id="clock"></div>
 
-<div class="card">
-<span>Founder</span>
-<h2>Yolter</h2>
-</div>
-
-<div class="card">
-<span>Всего игроков</span>
-<h2 id="playersCount">0</h2>
-</div>
-
-<div class="card">
-<span>R4+</span>
-<h2 id="r4count">0</h2>
-</div>
-
-<div class="card">
-<span>Ждут аттестацию</span>
-<h2 id="attestCount">0</h2>
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>⚡ Быстрые действия</h2>
-
-<div class="quick">
-
-<a href="pages/truck.html">🚛 Truck</a>
-<a href="pages/bank.html">🏦 Банк</a>
-<a href="pages/coming-soon.html">👥 Состав</a>
-<a href="pages/coming-soon.html">👑 Штаб</a>
-
-</div>
-
-</div>
-
-</main>
-
-</div>
+<audio id="bgMusic" loop>
+<source src="assets/music/e3u-theme.mp3" type="audio/mpeg">
+</audio>
 
 <script>
 
-const slides=document.querySelectorAll(".hero img");
+const images=[
+"assets/images/hero1.jpg",
+"assets/images/hero2.jpg",
+"assets/images/hero3.jpg"
+];
 
 let current=0;
 
-setInterval(()=>{
+const slider=document.getElementById("slider");
 
-slides[current].classList.remove("active");
+function showSlide(i){
+current=(i+images.length)%images.length;
+slider.style.backgroundImage=`url(${images[current]})`;
+}
 
-current=(current+1)%slides.length;
+showSlide(0);
 
-slides[current].classList.add("active");
+setInterval(()=>showSlide(current+1),5000);
 
-},30000);
+document.getElementById("next").onclick=()=>showSlide(current+1);
+document.getElementById("prev").onclick=()=>showSlide(current-1);
+
+const audio=document.getElementById("bgMusic");
+const volume=document.getElementById("volume");
+
+audio.volume=Number(localStorage.getItem("musicVolume"))||0.4;
+volume.value=audio.volume;
+
+volume.oninput=()=>{
+audio.volume=volume.value;
+localStorage.setItem("musicVolume",volume.value);
+};
+
+document.addEventListener("click",()=>{
+audio.play().catch(()=>{});
+},{once:true});
+
+const LANG={
+
+ru:{
+title:"E3U HQ",
+subtitle:"Founder Control Center",
+login:"Войти в HQ"
+},
+
+en:{
+title:"E3U HQ",
+subtitle:"Founder Control Center",
+login:"Enter HQ"
+},
+
+es:{
+title:"E3U HQ",
+subtitle:"Centro del Fundador",
+login:"Entrar al HQ"
+},
+
+jp:{
+title:"E3U HQ",
+subtitle:"HQ 管理センター",
+login:"HQに入る"
+}
+
+};
+
+const buttons=document.querySelectorAll(".lang");
+
+function setLang(lang){
+
+localStorage.setItem("lang",lang);
+
+buttons.forEach(b=>b.classList.remove("active"));
+
+document.querySelector(`[data-lang="${lang}"]`).classList.add("active");
+
+document.getElementById("title").textContent=LANG[lang].title;
+document.getElementById("subtitle").textContent=LANG[lang].subtitle;
+document.getElementById("loginBtn").textContent=LANG[lang].login;
+
+}
+
+buttons.forEach(btn=>btn.onclick=()=>setLang(btn.dataset.lang));
+
+setLang(localStorage.getItem("lang")||"ru");
 
 function updateClock(){
 
 const now=new Date();
 
-clock.textContent=now.toLocaleString("ru-RU",{
-timeZone:"Europe/Madrid",
+const text=now.toLocaleString("ru-RU",{
 weekday:"long",
 day:"numeric",
 month:"long",
 hour:"2-digit",
-minute:"2-digit"
+minute:"2-digit",
+timeZone:"Europe/Madrid"
 });
+
+document.getElementById("clock").textContent=text;
 
 }
 
@@ -234,15 +330,7 @@ updateClock();
 
 setInterval(updateClock,1000);
 
-musicBtn.onclick=()=>{
-
-musicBtn.textContent=musicBtn.textContent==="🎵"?"🔇":"🎵";
-
-};
-
 </script>
-
-<script src="js/router.js"></script>
 
 </body>
 </html>
