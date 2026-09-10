@@ -2,49 +2,74 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>E3U HQ</title>
 
-<link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/style.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
 <div class="layout">
 
-  <aside class="sidebar">
+<aside class="sidebar">
 
-    <div class="logo">
-      <h1>E3U</h1>
-      <span>HQ</span>
-    </div>
+<div class="logo">
+<div class="e3u">E3U</div>
+<div class="hq">HQ</div>
+</div>
 
-    <nav class="menu">
-      <button data-page="home">🏠 Главная</button>
-      <button data-page="roster">👥 Состав</button>
-      <button data-page="truck">🚛 Truck</button>
-      <button data-page="bank">🏦 Банк</button>
-      <button data-page="cash">💵 Наличка</button>
-      <button data-page="events">📅 События</button>
-      <button data-page="forum">📢 Форум</button>
-      <button data-page="profile">👤 Профиль</button>
-      <button data-page="settings">⚙ Настройки</button>
-      <button data-page="admin">👑 Штаб</button>
-    </nav>
+<nav class="menu">
 
-  </aside>
+<button data-page="home">🏠 Главная</button>
+<button data-page="admin">👥 Состав</button>
+<button data-page="attestation">📋 Аттестация</button>
+<button data-page="truck">🚛 Truck</button>
+<button data-page="bank">🏦 Банк</button>
+<button data-page="cash">💵 Наличка</button>
+<button data-page="events">📅 События</button>
+<button data-page="forum">💬 Форум</button>
+<button data-page="profile">👤 Профиль</button>
+<button data-page="settings">⚙ Настройки</button>
+<button data-page="roster">👑 Штаб</button>
 
-  <main class="content">
-    <div id="hq-bar"></div>
-    <div id="app"></div>
-  </main>
+</nav>
+
+</aside>
+
+<main class="content">
+
+<header class="topbar">
+
+<div>
+<h1>E3U Headquarters</h1>
+<p>Управление составом, аттестацией, Truck, Банком, событиями и офицерами.</p>
+</div>
+
+<div class="top-user">
+<span id="topUserName">Founder</span>
+</div>
+
+</header>
+
+<section id="app"></section>
+
+</main>
 
 </div>
 
+<!-- Firebase -->
 <script type="module" src="js/firebase.js"></script>
-<script src="js/core.js"></script>
-<script src="js/hqbar.js"></script>
+<script type="module" src="js/core.js"></script>
+<script type="module" src="js/auth.js"></script>
+
+<!-- Логика -->
+<script src="js/permissions.js"></script>
 <script src="js/router.js"></script>
 
 </body>

@@ -1,0 +1,90 @@
+<section class="panel">
+
+<h2>📋 Аттестация</h2>
+
+<div id="attestationList"></div>
+
+</section>
+
+<script type="module">
+
+const {
+db,
+collection,
+getDocs,
+doc,
+setDoc
+}=window.E3U_DB;
+
+const list=document.getElementById("attestationList");
+
+async function load(){
+
+list.innerHTML="";
+
+const users=await getDocs(collection(db,"users"));
+
+users.forEach(userDoc=>{
+
+const user=userDoc.data();
+
+const percent=Math.round(((user.rules?1:0)+(user.truck?1:0)+(user.bank?1:0)+(user.exam?1:0))/4*100);
+
+const card=document.createElement("div");
+
+card.className="card";
+
+card.style.marginBottom="15px";
+
+card.innerHTML=`
+<h3>${user.name}</h3>
+<p>${user.role}</p>
+
+<div style="background:#222;height:8px;border-radius:99px;overflow:hidden;margin:10px 0;">
+<div style="width:${percent}%;height:100%;background:#f0c340;"></div>
+</div>
+
+<p>${percent}%</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
+
+<label><input data-field="rules" type="checkbox" ${user.rules?"checked":""}> Правила</label>
+
+<label><input data-field="truck" type="checkbox" ${user.truck?"checked":""}> Truck</label>
+
+<label><input data-field="bank" type="checkbox" ${user.bank?"checked":""}> Банк</label>
+
+<label><input data-field="exam" type="checkbox" ${user.exam?"checked":""}> Экзамен</label>
+
+</div>
+
+<button style="margin-top:15px;width:100%;" class="btn">Сохранить</button>
+`;
+
+if(!(window.E3U_AUTH&&E3U_AUTH.isR4())){
+card.querySelectorAll("input,button").forEach(el=>el.disabled=true);
+}
+
+card.querySelector("button").onclick=async()=>{
+
+const data={...user};
+
+card.querySelectorAll("input").forEach(input=>{
+data[input.dataset.field]=input.checked;
+});
+
+await setDoc(doc(db,"users",userDoc.id),data);
+
+load();
+
+};
+
+list.appendChild(card);
+
+});
+
+}
+
+load();
+
+</script>

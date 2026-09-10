@@ -1,61 +1,35 @@
-const ROUTES = {
-    home: "pages/home.html",
-    roster: "pages/roster.html",
-    truck: "pages/truck.html",
-    bank: "pages/bank.html",
-    cash: "pages/cash.html",
-    events: "pages/events.html",
-    forum: "pages/forum.html",
-    profile: "pages/profile.html",
-    settings: "pages/settings.html",
-    admin: "pages/admin.html"
-};
+const app = document.getElementById("app");
 
 async function openPage(page) {
+  const res = await fetch(`pages/${page}.html`);
+  const html = await res.text();
 
-    const app = document.getElementById("app");
+  app.innerHTML = html;
 
-    try {
+  // Запускаем все скрипты страницы заново
+  app.querySelectorAll("script").forEach(oldScript => {
+    const script = document.createElement("script");
 
-        const res = await fetch(ROUTES[page]);
-        const html = await res.text();
-
-        app.innerHTML = html;
-
-        app.querySelectorAll("script").forEach(oldScript => {
-
-            const newScript = document.createElement("script");
-
-            newScript.textContent = oldScript.textContent;
-
-            document.body.appendChild(newScript);
-            document.body.removeChild(newScript);
-
-        });
-
-        renderHQBar();
-
-    } catch {
-
-        app.innerHTML = `
-            <div class="card">
-                <h2>Ошибка</h2>
-                <p>Не удалось открыть страницу.</p>
-            </div>
-        `;
-
+    if (oldScript.type) script.type = oldScript.type;
+    if (oldScript.src) {
+      script.src = oldScript.src;
+    } else {
+      script.textContent = oldScript.textContent;
     }
 
+    oldScript.replaceWith(script);
+  });
+
+  // Подсветка активной кнопки меню
+  document.querySelectorAll("[data-page]").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.page === page);
+  });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-
-    document.querySelectorAll("[data-page]").forEach(btn => {
-
-        btn.onclick = () => openPage(btn.dataset.page);
-
-    });
-
-    openPage("home");
-
+// Навигация
+document.querySelectorAll("[data-page]").forEach(btn => {
+  btn.onclick = () => openPage(btn.dataset.page);
 });
+
+// Открываем новую главную
+openPage("home");

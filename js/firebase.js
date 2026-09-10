@@ -19,9 +19,10 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+const db = getFirestore(app);
 
-export {
+window.E3U_DB = {
+  db,
   collection,
   addDoc,
   getDocs,

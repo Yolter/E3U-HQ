@@ -1,1 +1,242 @@
-<div class='card'><h2>Банк</h2><p>Каркас готов.</p></div>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Банк — E3U HQ</title>
+
+<link rel="stylesheet" href="../css/layout.css">
+<link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+<div class="layout">
+
+<aside id="sidebar"></aside>
+
+<main class="content">
+
+<div class="page-header">
+<h1>🏦 Банк семьи</h1>
+<p>Учёт недельной сдачи ресурсов.</p>
+</div>
+
+<div class="grid stats">
+
+<div class="card">
+<span>Карго</span>
+<h2 id="cargo">0M</h2>
+</div>
+
+<div class="card">
+<span>Амуниция</span>
+<h2 id="ammo">0M</h2>
+</div>
+
+<div class="card">
+<span>Металл</span>
+<h2 id="metal">0M</h2>
+</div>
+
+<div class="card">
+<span>Алмазы</span>
+<h2 id="diamonds">0M</h2>
+</div>
+
+</div>
+
+<div class="card">
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+<h2>Неделя 1</h2>
+<h3 id="progressText">0 / 96</h3>
+</div>
+
+<div class="progress">
+<div id="progressBar" style="width:0%"></div>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Игроки</h2>
+
+<div id="playerList"></div>
+
+</div>
+
+<div class="card">
+
+<h2>История</h2>
+
+<div id="history"></div>
+
+</div>
+
+</main>
+
+</div>
+
+<script type="module">
+
+import { db } from "../js/firebase.js";
+
+import {
+doc,
+getDoc,
+updateDoc,
+collection,
+getDocs,
+addDoc,
+query,
+orderBy,
+limit,
+serverTimestamp
+}
+from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+const PACKAGE=10000000;
+
+const balanceRef=doc(db,"bank_balance","current");
+const cycleRef=doc(db,"bank_cycle","week1");
+
+async function loadBalance(){
+
+const snap=await getDoc(balanceRef);
+
+const data=snap.data();
+
+cargo.textContent=(data.cargo/1000000)+"M";
+ammo.textContent=(data.ammo/1000000)+"M";
+metal.textContent=(data.metal/1000000)+"M";
+diamonds.textContent=(data.diamonds/1000000)+"M";
+
+}
+
+async function loadCycle(){
+
+const snap=await getDoc(cycleRef);
+
+const data=snap.data();
+
+progressText.textContent=data.submitted+" / "+data.totalPlayers;
+
+progressBar.style.width=(data.submitted/data.totalPlayers*100)+"%";
+
+}
+
+async function loadPlayers(){
+
+const list=document.getElementById("playerList");
+
+list.innerHTML="";
+
+const users=await getDocs(collection(db,"users"));
+
+users.forEach(user=>{
+
+const data=user.data();
+
+const row=document.createElement("div");
+
+row.className="active-item";
+
+const btn=document.createElement("button");
+
+btn.className="gold-btn";
+
+btn.textContent="⭕";
+
+btn.onclick=()=>submitResources(user.id,data.name||user.id);
+
+row.innerHTML=`
+<div>
+<b>${data.name||user.id}</b>
+<br>
+<small>${data.role||""}</small>
+</div>
+`;
+
+row.appendChild(btn);
+
+list.appendChild(row);
+
+});
+
+}
+
+async function submitResources(id,name){
+
+const balance=(await getDoc(balanceRef)).data();
+
+await updateDoc(balanceRef,{
+cargo:balance.cargo+PACKAGE,
+ammo:balance.ammo+PACKAGE,
+metal:balance.metal+PACKAGE,
+diamonds:balance.diamonds+PACKAGE
+});
+
+const cycle=(await getDoc(cycleRef)).data();
+
+await updateDoc(cycleRef,{
+submitted:cycle.submitted+1
+});
+
+await addDoc(collection(db,"bank_logs"),{
+player:name,
+time:serverTimestamp(),
+package:PACKAGE
+});
+
+loadBalance();
+
+loadCycle();
+
+loadHistory();
+
+}
+
+async function loadHistory(){
+
+const box=document.getElementById("history");
+
+box.innerHTML="";
+
+const q=query(collection(db,"bank_logs"),orderBy("time","desc"),limit(10));
+
+const logs=await getDocs(q);
+
+logs.forEach(log=>{
+
+const data=log.data();
+
+const item=document.createElement("div");
+
+item.className="active-item";
+
+item.innerHTML=`
+<div>
+<b>${data.player}</b>
+<br>
+<small>Сдал недельный пакет</small>
+</div>
+`;
+
+box.appendChild(item);
+
+});
+
+}
+
+loadBalance();
+loadCycle();
+loadPlayers();
+loadHistory();
+
+</script>
+
+<script src="../js/router.js"></script>
+
+</body>
+</html>

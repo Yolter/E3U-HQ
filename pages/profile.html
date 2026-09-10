@@ -1,1 +1,81 @@
-<div class='card'><h2>Профиль</h2></div>
+<section class="panel">
+  <h2>👤 Профиль</h2>
+
+  <div class="card" style="margin-bottom:20px;padding:20px;">
+    <h3>Текущий пользователь</h3>
+
+    <p>Ник: <b id="currentName">—</b></p>
+    <p>Роль: <b id="currentRole">—</b></p>
+  </div>
+
+  <div class="card" style="padding:20px;">
+    <h3>Войти как</h3>
+
+    <select id="userSelect" style="width:100%;padding:10px;margin:15px 0;"></select>
+
+    <button id="loginBtn" class="btn" style="width:100%;">
+      Войти
+    </button>
+  </div>
+</section>
+
+<script>
+(async () => {
+
+  while(!window.E3U_DB){
+    await new Promise(r=>setTimeout(r,100));
+  }
+
+  const {db,collection,getDocs}=window.E3U_DB;
+
+  const select=document.getElementById("userSelect");
+  const currentName=document.getElementById("currentName");
+  const currentRole=document.getElementById("currentRole");
+
+  function refresh(){
+    const user=E3U_AUTH.getCurrentUser();
+    currentName.textContent=user.name;
+    currentRole.textContent=user.role;
+  }
+
+  async function loadPlayers(){
+
+    select.innerHTML="";
+
+    const snap=await getDocs(collection(db,"users"));
+
+    snap.forEach(doc=>{
+
+      const user=doc.data();
+
+      const option=document.createElement("option");
+
+      option.value=JSON.stringify(user);
+
+      option.textContent=`${user.name} (${user.role})`;
+
+      select.appendChild(option);
+
+    });
+
+  }
+
+  document.getElementById("loginBtn").onclick=()=>{
+
+    const user=JSON.parse(select.value);
+
+    E3U_AUTH.setCurrentUser(user);
+
+    refresh();
+
+    E3U_PERMISSIONS.apply();
+
+    alert("Вход выполнен.");
+  };
+
+  await loadPlayers();
+
+  refresh();
+
+})();
+</script>

@@ -6,3 +6,110 @@ button,input,select,textarea{width:100%;padding:12px;margin-top:10px;border-radi
 button{background:var(--gold);color:#111;font-weight:bold}
 .badge{display:inline-block;padding:8px 12px;border:1px solid var(--gold);border-radius:999px;color:var(--gold);margin-right:8px}
 .player-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #222}
+.dashboard{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:15px;
+margin:20px 0;
+}
+
+.stat-card{
+background:#141414;
+border:1px solid #2a2a2a;
+padding:18px;
+border-radius:16px;
+}
+
+.stat-card span{
+color:#999;
+font-size:13px;
+}
+
+.stat-card h3{
+margin:8px 0 0;
+color:#f0c341;
+font-size:30px;
+}
+
+.admin-actions{
+display:flex;
+gap:15px;
+margin:20px 0;
+flex-wrap:wrap;
+}
+
+.admin-actions input{
+flex:1;
+padding:12px;
+background:#111;
+color:#fff;
+border:1px solid #333;
+border-radius:10px;
+}
+
+.player-card{
+background:#131313;
+border:1px solid #252525;
+border-radius:16px;
+padding:18px;
+margin-bottom:15px;
+}
+
+.player-top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.player-actions{
+display:flex;
+gap:10px;
+}
+
+.player-actions button{
+width:40px;
+height:40px;
+border:none;
+border-radius:10px;
+background:#222;
+cursor:pointer;
+}
+
+.roleBadge{
+padding:5px 10px;
+border-radius:999px;
+font-size:12px;
+display:inline-block;
+margin-top:5px;
+}
+
+.progress{
+height:8px;
+background:#242424;
+border-radius:99px;
+overflow:hidden;
+margin:12px 0;
+}
+
+.progress div{
+height:100%;
+background:#f0c341;
+}
+
+.activity-item{
+display:flex;
+gap:12px;
+align-items:center;
+padding:12px;
+background:#141414;
+border:1px solid #242424;
+border-radius:12px;
+margin-bottom:10px;
+}
+
+.dot{
+width:10px;
+height:10px;
+background:#f0c341;
+border-radius:50%;
+}

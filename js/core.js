@@ -1,47 +1,38 @@
-const E3U = {
-  keys: {
-    users: "e3u_users",
-    current: "e3u_current_user",
-    music: "e3u_music"
-  }
-};
+import { db } from "./firebase.js";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  orderBy,
+  limit,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-window.E3U = E3U;
+window.E3U_CORE = {
 
-const defaultUsers = [
-  { name: "Yolter", role: "Founder" }
-];
+  async addActivity(type, text, role = "System") {
+    await addDoc(collection(db, "activity"), {
+      type,
+      text,
+      role,
+      time: serverTimestamp()
+    });
+  },
 
-function loadUsers() {
-  return JSON.parse(localStorage.getItem(E3U.keys.users)) || defaultUsers;
-}
-
-function saveUsers(users) {
-  localStorage.setItem(E3U.keys.users, JSON.stringify(users));
-}
-
-window.loadUsers = loadUsers;
-window.saveUsers = saveUsers;
-
-if (!localStorage.getItem(E3U.keys.users)) {
-  saveUsers(defaultUsers);
-}
-
-window.currentUser = JSON.parse(
-  localStorage.getItem(E3U.keys.current) ||
-  '{"name":"Yolter","role":"Founder"}'
-);if (loadUsers().length === 0) {
-    saveUsers(defaultUsers);
-    localStorage.setItem(
-        E3U.keys.current,
-        JSON.stringify(defaultUsers[0])
+  async getActivity(count = 5) {
+    const q = query(
+      collection(db, "activity"),
+      orderBy("time", "desc"),
+      limit(count)
     );
-}window.E3U = window.E3U || {};
 
-E3U.players = function () {
-    return loadUsers();
-};
+    const snap = await getDocs(q);
 
-E3U.savePlayers = function (users) {
-    saveUsers(users);
+    return snap.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+  }
+
 };

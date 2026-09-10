@@ -1,1 +1,110 @@
-<div class='card'><h2>Добро пожаловать в E3U HQ</h2></div>
+<section class="section-panel">
+  <div class="hero">
+    <div>
+      <h1>E3U Headquarters</h1>
+      <p>Управление составом, аттестацией, Truck, Банком, событиями и офицерами.</p>
+    </div>
+
+    <div class="hero-badge">
+      👑 Founder
+    </div>
+  </div>
+
+  <h2>👑 Штаб Founder</h2>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span>Founder</span>
+      <h3 id="founderName">Yolter</h3>
+    </div>
+
+    <div class="stat-card">
+      <span>Всего игроков</span>
+      <h3 id="playersCount">0</h3>
+    </div>
+
+    <div class="stat-card">
+      <span>R4+</span>
+      <h3 id="officerCount">0</h3>
+    </div>
+
+    <div class="stat-card warning">
+      <span>Ждут аттестацию</span>
+      <h3 id="waitingCount">0</h3>
+    </div>
+  </div>
+
+  <button class="btn" id="quickAdd">
+    ➕ Добавить игрока
+  </button>
+
+  <div class="search-box">
+    <input id="searchPlayers" placeholder="Поиск игрока">
+  </div>
+
+  <div id="recentActivity"></div>
+</section>
+
+<script type="module">
+import {db} from "../js/firebase.js";
+import {
+  collection,
+  getDocs,
+  query,
+  orderBy,
+  limit
+} from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+
+async function refreshHome(){
+
+  const users = await getDocs(collection(db,"users"));
+
+  let total=0;
+  let officers=0;
+
+  users.forEach(doc=>{
+    total++;
+
+    const role=(doc.data().role||"").toUpperCase();
+
+    if(role.startsWith("R4") || role==="FOUNDER"){
+      officers++;
+    }
+  });
+
+  playersCount.textContent=total;
+  officerCount.textContent=officers;
+
+  const activityQ=query(
+    collection(db,"activity"),
+    orderBy("time","desc"),
+    limit(5)
+  );
+
+  const activity=await getDocs(activityQ);
+
+  recentActivity.innerHTML="";
+
+  activity.forEach(doc=>{
+
+    const d=doc.data();
+
+    recentActivity.innerHTML+=`
+      <div class="activity-item">
+        <div class="dot"></div>
+        <div>
+          <strong>${d.text}</strong><br>
+          <small>${d.role||""}</small>
+        </div>
+      </div>
+    `;
+  });
+
+}
+
+quickAdd.onclick=()=>{
+  document.querySelector('[data-page="staff"]').click();
+};
+
+refreshHome();
+</script>
