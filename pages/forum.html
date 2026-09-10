@@ -1,0 +1,86 @@
+<div class="page">
+
+<section class="page-header">
+<h1>📢 Форум E3U</h1>
+<p>Приказы, объявления и новости штаба.</p>
+</section>
+
+<div class="card">
+
+<h3>Новое объявление</h3>
+
+<input id="forumTitle" placeholder="Заголовок">
+
+<textarea id="forumText" placeholder="Текст..." style="margin-top:12px;width:100%;height:120px;"></textarea>
+
+<button id="forumPublish" style="margin-top:14px;">Опубликовать</button>
+
+</div>
+
+<div id="forumPosts"></div>
+
+</div>
+
+<script>
+const KEY="e3u_forum";
+
+function renderForum(){
+
+const box=document.getElementById("forumPosts");
+const posts=E3U.get(KEY,[]);
+
+box.innerHTML="";
+
+posts.forEach((p,i)=>{
+
+const card=document.createElement("div");
+card.className="card";
+card.style.marginBottom="14px";
+
+card.innerHTML=`
+<h3>${p.title}</h3>
+<p style="margin-top:10px;">${p.text}</p>
+<div style="margin-top:14px;color:#888;font-size:13px;">${p.time}</div>
+<button style="margin-top:16px;">Удалить</button>
+`;
+
+card.querySelector("button").onclick=()=>{
+
+posts.splice(i,1);
+E3U.set(KEY,posts);
+renderForum();
+
+};
+
+box.appendChild(card);
+
+});
+
+}
+
+document.getElementById("forumPublish").onclick=()=>{
+
+const title=document.getElementById("forumTitle").value.trim();
+const text=document.getElementById("forumText").value.trim();
+
+if(!title||!text) return;
+
+const posts=E3U.get(KEY,[]);
+
+posts.unshift({
+title,
+text,
+time:new Date().toLocaleString("ru-RU")
+});
+
+E3U.set(KEY,posts);
+
+document.getElementById("forumTitle").value="";
+document.getElementById("forumText").value="";
+
+renderForum();
+
+};
+
+renderForum();
+</script>

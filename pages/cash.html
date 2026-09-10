@@ -1,0 +1,70 @@
+<div class="page">
+
+<section class="page-header">
+<h1 id="cashTitle">💵 Наличка</h1>
+<p>Кто сегодня сдал наличку.</p>
+</section>
+
+<div class="card">
+
+<h3>Сегодня</h3>
+
+<div id="cashList"></div>
+
+</div>
+
+</div>
+
+<script>
+const PLAYERS_KEY="e3u_players";
+const CASH_KEY="e3u_cash";
+
+const TITLES=[
+"🦝 Енот пересчитал купюры.",
+"💸 Кэш занесён.",
+"🍕 На шавуху не ушло.",
+"💰 Общак доволен.",
+"🐿️ Белка ничего не украла.",
+"🧱 Общак стал тяжелее.",
+"🎩 Дон сказал: Нормально.",
+"💼 Чемодан захлопнулся.",
+"🔥 Деньги нашли дом.",
+"🍺 Сегодня без лишних трат."
+];
+
+document.getElementById("cashTitle").textContent=
+TITLES[Math.floor(Math.random()*TITLES.length)];
+
+const players=JSON.parse(localStorage.getItem(PLAYERS_KEY)||"[]");
+const data=JSON.parse(localStorage.getItem(CASH_KEY)||"{}");
+
+const box=document.getElementById("cashList");
+
+players.filter(p=>p.role==="member").forEach(p=>{
+
+const done=data[p.name];
+
+const card=document.createElement("div");
+card.className="card";
+card.style.marginBottom="10px";
+
+card.innerHTML=`
+<div style="display:flex;justify-content:space-between;align-items:center;">
+<b>${p.name}</b>
+<button>${done?"СДАНО":"НЕ СДАНО"}</button>
+</div>`;
+
+card.querySelector("button").onclick=()=>{
+
+data[p.name]=!data[p.name];
+
+localStorage.setItem(CASH_KEY,JSON.stringify(data));
+
+location.reload();
+
+};
+
+box.appendChild(card);
+
+});
+</script>

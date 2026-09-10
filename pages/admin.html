@@ -1,0 +1,180 @@
+<div class="page">
+
+<section class="page-header">
+    <h1>👑 Штаб E3U</h1>
+    <p>Управление составом семьи.</p>
+</section>
+
+<div class="card">
+    <h3>➕ Добавить игрока</h3>
+
+    <input id="newName" placeholder="Игровой ник">
+
+    <select id="newRole">
+        <option value="founder">👑 Founder</option>
+        <option value="r4">⭐ R4</option>
+        <option value="r3">🥇 R3</option>
+        <option value="r2">🥈 R2</option>
+        <option value="r1">🥉 R1</option>
+        <option value="truck">🚛 Truck Officer</option>
+        <option value="bank">🏦 Bank Officer</option>
+        <option value="cash">💵 Cash Officer</option>
+        <option value="member">👤 Участник</option>
+    </select>
+
+    <button id="addPlayerBtn">Добавить игрока</button>
+</div>
+
+<div class="card">
+    <h3>👥 Состав семьи</h3>
+
+    <div id="playerList"></div>
+</div>
+
+</div>
+
+<script>
+
+const ROLE_NAMES={
+
+founder:"👑 Founder",
+r4:"⭐ R4",
+r3:"🥇 R3",
+r2:"🥈 R2",
+r1:"🥉 R1",
+truck:"🚛 Truck Officer",
+bank:"🏦 Bank Officer",
+cash:"💵 Cash Officer",
+member:"👤 Участник"
+
+};
+
+function renderPlayers(){
+
+const box=document.getElementById("playerList");
+
+const players=E3U.players();
+
+box.innerHTML="";
+
+if(players.length===0){
+
+box.innerHTML="<p style='color:#888;'>Состав пока пуст.</p>";
+
+return;
+
+}
+
+players.forEach((player,index)=>{
+
+const row=document.createElement("div");
+
+row.className="player-row";
+
+row.innerHTML=`
+
+<div>
+
+<div style="font-weight:700;">${player.name}</div>
+
+<div style="color:#888;font-size:13px;">
+${ROLE_NAMES[player.role]}
+</div>
+
+</div>
+
+<div style="display:flex;gap:8px;">
+
+<button class="small edit">✏</button>
+
+<button class="small danger">🗑</button>
+
+</div>
+
+`;
+
+row.querySelector(".edit").onclick=()=>{
+
+const role=prompt(
+`Роль для ${player.name}
+
+founder
+r4
+r3
+r2
+r1
+truck
+bank
+cash
+member`,
+player.role
+);
+
+if(!role) return;
+
+player.role=role;
+
+E3U.savePlayers(players);
+
+renderPlayers();
+
+if(window.renderHQBar) renderHQBar();
+
+};
+
+row.querySelector(".danger").onclick=()=>{
+
+if(!confirm(`Удалить ${player.name}?`)) return;
+
+players.splice(index,1);
+
+E3U.savePlayers(players);
+
+renderPlayers();
+
+if(window.renderHQBar) renderHQBar();
+
+};
+
+box.appendChild(row);
+
+});
+
+}
+
+document.getElementById("addPlayerBtn").onclick=()=>{
+
+const name=document.getElementById("newName").value.trim();
+
+const role=document.getElementById("newRole").value;
+
+if(!name){
+
+alert("Введите ник.");
+
+return;
+
+}
+
+const players=E3U.players();
+
+players.push({
+
+name,
+role
+
+});
+
+E3U.savePlayers(players);
+
+document.getElementById("newName").value="";
+
+renderPlayers();
+
+if(window.renderHQBar) renderHQBar();
+
+};
+
+renderPlayers();
+
+</script>

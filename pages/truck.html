@@ -1,0 +1,66 @@
+<div class="page">
+
+<section class="page-header">
+<h1>🚛 Truck Control</h1>
+<p>Назначение водителя и контроль рейса.</p>
+</section>
+
+<div class="card">
+
+<h3>Сегодняшний водитель</h3>
+
+<select id="truckSelect"></select>
+
+<button id="truckSave" style="margin-top:16px;">Назначить</button>
+
+</div>
+
+<div class="card">
+
+<h3>Статус</h3>
+
+<div id="truckStatus">
+Водитель ещё не назначен.
+</div>
+
+</div>
+
+</div>
+
+<script>
+const PLAYERS_KEY="e3u_players";
+const TRUCK_KEY="e3u_truck";
+
+const players=JSON.parse(localStorage.getItem(PLAYERS_KEY)||"[]");
+
+const select=document.getElementById("truckSelect");
+
+players.forEach(p=>{
+
+const o=document.createElement("option");
+
+o.value=p.name;
+o.textContent=p.name;
+
+select.appendChild(o);
+
+});
+
+const saved=localStorage.getItem(TRUCK_KEY);
+
+if(saved){
+
+document.getElementById("truckStatus").innerHTML=
+`🚛 Сегодня назначен: <b>${saved}</b>`;
+
+}
+
+document.getElementById("truckSave").onclick=()=>{
+
+localStorage.setItem(TRUCK_KEY,select.value);
+
+document.getElementById("truckStatus").innerHTML=
+`🚛 Сегодня назначен: <b>${select.value}</b>`;
+
+};
+</script>

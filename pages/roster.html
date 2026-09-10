@@ -1,0 +1,103 @@
+<div class="page">
+
+<section class="page-header">
+    <h1>👥 Состав E3U</h1>
+    <p>Единый реестр семьи.</p>
+</section>
+
+<div class="card">
+    <input id="rosterSearch" placeholder="🔎 Поиск по нику">
+</div>
+
+<div id="rosterGroups"></div>
+
+</div>
+
+<script>
+
+const ROLE_ORDER=[
+"founder",
+"r4",
+"r3",
+"r2",
+"r1",
+"truck",
+"bank",
+"cash",
+"member"
+];
+
+const ROLE_TITLE={
+
+founder:"👑 Founder",
+r4:"⭐ R4",
+r3:"🥇 R3",
+r2:"🥈 R2",
+r1:"🥉 R1",
+truck:"🚛 Truck Officer",
+bank:"🏦 Bank Officer",
+cash:"💵 Cash Officer",
+member:"👤 Участники"
+
+};
+
+function renderRoster(){
+
+const search=document.getElementById("rosterSearch")
+.value
+.toLowerCase()
+.trim();
+
+const box=document.getElementById("rosterGroups");
+
+const players=E3U.players();
+
+box.innerHTML="";
+
+ROLE_ORDER.forEach(role=>{
+
+const list=players.filter(p=>{
+
+return p.role===role &&
+p.name.toLowerCase().includes(search);
+
+});
+
+if(list.length===0) return;
+
+const card=document.createElement("div");
+
+card.className="card";
+
+let html=`
+<h3>${ROLE_TITLE[role]} (${list.length})</h3>
+`;
+
+list.forEach(player=>{
+
+html+=`
+<div class="player-row">
+
+<div>
+<b>${player.name}</b>
+</div>
+
+</div>
+`;
+
+});
+
+card.innerHTML=html;
+
+box.appendChild(card);
+
+});
+
+}
+
+document.getElementById("rosterSearch")
+.addEventListener("input",renderRoster);
+
+renderRoster();
+
+</script>

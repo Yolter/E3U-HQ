@@ -1,0 +1,65 @@
+<div class="page">
+
+<section class="page-header">
+<h1>📅 Event Center</h1>
+<p>Все события семьи.</p>
+</section>
+
+<div class="card">
+
+<span class="badge">🛒 Тайный рынок</span>
+
+<div class="timer" id="marketTimer">--</div>
+
+<p id="marketText">Завтра в 20:00 МСК</p>
+
+</div>
+
+<div class="card">
+
+<span class="badge">⚔ Battle Ground</span>
+
+<div class="timer" id="bsTimer">--</div>
+
+<p>Время выставляется Founder.</p>
+
+</div>
+
+</div>
+
+<script>
+function nextMarket(){
+
+const target=new Date();
+
+target.setDate(target.getDate()+1);
+
+target.setHours(17,0,0,0);
+
+return target;
+
+}
+
+function update(){
+
+const diff=nextMarket()-new Date();
+
+const d=Math.floor(diff/86400000);
+
+const h=Math.floor(diff%86400000/3600000);
+
+const m=Math.floor(diff%3600000/60000);
+
+const s=Math.floor(diff%60000/1000);
+
+document.getElementById("marketTimer").textContent=
+`${d}д ${String(h).padStart(2,"0")}ч ${String(m).padStart(2,"0")}м ${String(s).padStart(2,"0")}с`;
+
+document.getElementById("bsTimer").textContent="Ожидание";
+
+}
+
+update();
+
+setInterval(update,1000);
+</script>
