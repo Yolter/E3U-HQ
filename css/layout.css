@@ -1,0 +1,7 @@
+.layout{display:grid;grid-template-columns:250px 1fr;min-height:100vh}
+.sidebar{padding:20px;border-right:1px solid #222}
+.content{padding:24px}
+.menu{display:flex;flex-direction:column;gap:8px}
+.logo h1{color:#f5c542;font-size:42px}
+.logo span{font-size:28px}
+@media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{border-right:none;border-bottom:1px solid #222}}

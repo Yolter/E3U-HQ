@@ -1,0 +1,8 @@
+:root{--bg:#050505;--panel:#111;--gold:#f5c542;--text:#fff;--border:#2d2205}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px}
+button,input,select,textarea{width:100%;padding:12px;margin-top:10px;border-radius:10px;border:1px solid var(--border)}
+button{background:var(--gold);color:#111;font-weight:bold}
+.badge{display:inline-block;padding:8px 12px;border:1px solid var(--gold);border-radius:999px;color:var(--gold);margin-right:8px}
+.player-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #222}

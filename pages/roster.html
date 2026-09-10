@@ -1,0 +1,4 @@
+<div class="card"><h2>Состав</h2><div id="list"></div></div>
+<script>
+document.getElementById("list").innerHTML=E3U.players().map(p=>`<div class='player-row'><span>${p.name}</span><span>${p.role}</span></div>`).join("");
+</script>

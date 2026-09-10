@@ -1,0 +1,184 @@
+<section class="panel">
+    <h2>Штаб Founder</h2>
+
+    <button id="addPlayer" class="btn" style="width:100%;margin:10px 0;">
+        ➕ Добавить
+    </button>
+
+    <div id="playerList"></div>
+</section>
+
+<div id="playerModal" class="modal hidden">
+    <div class="modal-box">
+        <h3 id="modalTitle">Редактировать бойца</h3>
+
+        <input id="modalName" type="text" placeholder="Ник">
+
+        <select id="modalRole">
+            <option>Founder</option>
+            <option>R4</option>
+            <option>R3</option>
+            <option>R2</option>
+            <option>R1</option>
+            <option>Truck Officer</option>
+            <option>Bank Officer</option>
+            <option>Cash Officer</option>
+        </select>
+
+        <div class="modal-actions">
+            <button id="savePlayer" class="btn">Сохранить</button>
+            <button id="cancelPlayer" class="btn">Отмена</button>
+        </div>
+    </div>
+</div>
+
+<style>
+.modal{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.7);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+.hidden{display:none;}
+
+.modal-box{
+    width:320px;
+    background:#111;
+    border:1px solid #d4af37;
+    border-radius:14px;
+    padding:18px;
+}
+
+.modal-box h3{
+    color:#fff;
+    margin:0 0 15px;
+}
+
+.modal-box input,
+.modal-box select{
+    width:100%;
+    padding:10px;
+    margin-bottom:12px;
+    background:#1b1b1b;
+    color:#fff;
+    border:1px solid #444;
+    border-radius:8px;
+}
+
+.modal-actions{
+    display:flex;
+    gap:10px;
+}
+
+.modal-actions .btn{
+    flex:1;
+}
+</style>
+
+<script>
+const playerList=document.getElementById("playerList");
+const addBtn=document.getElementById("addPlayer");
+
+const modal=document.getElementById("playerModal");
+const modalTitle=document.getElementById("modalTitle");
+const modalName=document.getElementById("modalName");
+const modalRole=document.getElementById("modalRole");
+
+const saveBtn=document.getElementById("savePlayer");
+const cancelBtn=document.getElementById("cancelPlayer");
+
+let editIndex=null;
+
+function renderPlayers(){
+    const users=loadUsers();
+
+    playerList.innerHTML=users.map((u,i)=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #333;">
+            <div>
+                <div><b>${u.name}</b></div>
+                <small>${u.role}</small>
+            </div>
+
+            <div style="display:flex;gap:8px;">
+                <button class="btn edit" data-i="${i}">✏️</button>
+                <button class="btn del" data-i="${i}">🗑️</button>
+            </div>
+        </div>
+    `).join("");
+}
+
+function openModal(i){
+    editIndex=i;
+
+    const users=loadUsers();
+
+    if(i===null){
+        modalTitle.textContent="Добавить бойца";
+        modalName.value="";
+        modalRole.value="R3";
+    }else{
+        modalTitle.textContent="Редактировать бойца";
+        modalName.value=users[i].name;
+        modalRole.value=users[i].role;
+    }
+
+    modal.classList.remove("hidden");
+}
+
+function closeModal(){
+    modal.classList.add("hidden");
+}
+
+addBtn.onclick=()=>openModal(null);
+
+cancelBtn.onclick=closeModal;
+
+saveBtn.onclick=()=>{
+    const users=loadUsers();
+
+    const name=modalName.value.trim();
+    const role=modalRole.value;
+
+    if(!name)return;
+
+    if(editIndex===null){
+        users.push({name,role});
+    }else{
+        users[editIndex].name=name;
+        users[editIndex].role=role;
+    }
+
+    saveUsers(users);
+    closeModal();
+    renderPlayers();
+
+    if(window.renderHQBar)renderHQBar();
+};
+
+playerList.onclick=(e)=>{
+
+    const edit=e.target.closest(".edit");
+    if(edit){
+        openModal(Number(edit.dataset.i));
+        return;
+    }
+
+    const del=e.target.closest(".del");
+    if(del){
+        const users=loadUsers();
+        const i=Number(del.dataset.i);
+
+        if(confirm(`Удалить ${users[i].name}?`)){
+            users.splice(i,1);
+            saveUsers(users);
+            renderPlayers();
+            if(window.renderHQBar)renderHQBar();
+        }
+    }
+};
+
+renderPlayers();
+</script>

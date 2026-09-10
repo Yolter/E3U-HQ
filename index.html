@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E3U HQ</title>
+
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/layout.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <h1>E3U</h1>
+            <span>HQ</span>
+        </div>
+
+        <nav class="menu">
+            <button data-page="home">🏠 Главная</button>
+            <button data-page="roster">👥 Состав</button>
+            <button data-page="truck">🚛 Truck</button>
+            <button data-page="bank">🏦 Банк</button>
+            <button data-page="cash">💵 Наличка</button>
+            <button data-page="events">📅 События</button>
+            <button data-page="forum">📢 Форум</button>
+            <button data-page="profile">👤 Профиль</button>
+            <button data-page="settings">⚙ Настройки</button>
+            <button data-page="admin">👑 Штаб</button>
+        </nav>
+
+    </aside>
+
+    <main class="content">
+
+        <div id="hq-bar"></div>
+
+        <div id="app"></div>
+
+    </main>
+
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/hqbar.js"></script>
+<script src="js/router.js"></script>
+
+</body>
+</html>
