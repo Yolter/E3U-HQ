@@ -1,14 +1,10 @@
-(function(){
-
-if(localStorage.getItem(E3U.keys.user)) return;
-
-const user={
-
-name:"Yolter",
-role:"Founder"
-
-};
-
-localStorage.setItem(E3U.keys.user,JSON.stringify(user));
-
-})();
+const E3U = {
+  keys:{
+    players:"e3u_players",
+    bank:"e3u_bank",
+    cash:"e3u_cash",
+    truck:"e3u_truck",
+    forum:"e3u_forum",
+    user:"e3u_user",
+    role:"e3u_role"
+  },
