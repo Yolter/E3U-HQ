@@ -2,74 +2,246 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>E3U HQ</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>E3U Headquarters</title>
 
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/style.css">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+.hero{
+position:relative;
+height:340px;
+overflow:hidden;
+border-radius:24px;
+margin-bottom:24px;
+background:#111;
+}
+
+.hero::after{
+content:"";
+position:absolute;
+inset:0;
+background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.75));
+}
+
+.hero img{
+position:absolute;
+width:100%;
+height:100%;
+object-fit:cover;
+opacity:0;
+transition:opacity 1.8s ease;
+}
+
+.hero img.active{
+opacity:1;
+}
+
+.hero-content{
+position:absolute;
+left:40px;
+bottom:35px;
+z-index:2;
+}
+
+.hero h1{
+font-size:52px;
+margin:0;
+}
+
+.hero p{
+opacity:.85;
+margin-top:8px;
+}
+
+.topbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:18px;
+flex-wrap:wrap;
+gap:10px;
+}
+
+.lang button{
+margin-left:6px;
+padding:8px 12px;
+border:none;
+border-radius:10px;
+background:#222;
+color:#fff;
+cursor:pointer;
+}
+
+.lang button:hover{
+background:#f0c541;
+color:#000;
+}
+
+.music{
+display:flex;
+align-items:center;
+gap:10px;
+}
+
+.music input{
+width:90px;
+}
+
+.quick{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:14px;
+margin-top:20px;
+}
+
+.quick a{
+display:block;
+text-align:center;
+padding:14px;
+border-radius:16px;
+background:#f0c541;
+color:#000;
+font-weight:700;
+text-decoration:none;
+transition:.25s;
+}
+
+.quick a:hover{
+transform:translateY(-3px);
+box-shadow:0 0 20px rgba(240,197,65,.35);
+}
+</style>
+
 </head>
 
 <body>
 
 <div class="layout">
 
-<aside class="sidebar">
-
-<div class="logo">
-<div class="e3u">E3U</div>
-<div class="hq">HQ</div>
-</div>
-
-<nav class="menu">
-
-<button data-page="home">🏠 Главная</button>
-<button data-page="admin">👥 Состав</button>
-<button data-page="attestation">📋 Аттестация</button>
-<button data-page="truck">🚛 Truck</button>
-<button data-page="bank">🏦 Банк</button>
-<button data-page="cash">💵 Наличка</button>
-<button data-page="events">📅 События</button>
-<button data-page="forum">💬 Форум</button>
-<button data-page="profile">👤 Профиль</button>
-<button data-page="settings">⚙ Настройки</button>
-<button data-page="roster">👑 Штаб</button>
-
-</nav>
-
-</aside>
+<aside id="sidebar"></aside>
 
 <main class="content">
 
-<header class="topbar">
+<div class="topbar">
 
-<div>
-<h1>E3U Headquarters</h1>
-<p>Управление составом, аттестацией, Truck, Банком, событиями и офицерами.</p>
+<div id="clock"></div>
+
+<div class="music">
+<button id="musicBtn">🎵</button>
+<input type="range" id="volume" min="0" max="100" value="40">
 </div>
 
-<div class="top-user">
-<span id="topUserName">Founder</span>
+<div class="lang">
+<button>RU</button>
+<button>EN</button>
+<button>ES</button>
+<button>JP</button>
 </div>
 
-</header>
+</div>
 
-<section id="app"></section>
+<div class="hero">
+
+<img class="active" src="https://images.unsplash.com/photo-1511818966892-d7d671e672a2?w=1600" alt="">
+<img src="https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=1600" alt="">
+<img src="https://images.unsplash.com/photo-1493246507139-91e8fad9978e?w=1600" alt="">
+
+<div class="hero-content">
+<h1>E3U HQ</h1>
+<p>Founder Control Center</p>
+</div>
+
+</div>
+
+<div class="grid stats">
+
+<div class="card">
+<span>Founder</span>
+<h2>Yolter</h2>
+</div>
+
+<div class="card">
+<span>Всего игроков</span>
+<h2 id="playersCount">0</h2>
+</div>
+
+<div class="card">
+<span>R4+</span>
+<h2 id="r4count">0</h2>
+</div>
+
+<div class="card">
+<span>Ждут аттестацию</span>
+<h2 id="attestCount">0</h2>
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>⚡ Быстрые действия</h2>
+
+<div class="quick">
+
+<a href="pages/truck.html">🚛 Truck</a>
+<a href="pages/bank.html">🏦 Банк</a>
+<a href="pages/coming-soon.html">👥 Состав</a>
+<a href="pages/coming-soon.html">👑 Штаб</a>
+
+</div>
+
+</div>
 
 </main>
 
 </div>
 
-<!-- Firebase -->
-<script type="module" src="js/firebase.js"></script>
-<script type="module" src="js/core.js"></script>
-<script type="module" src="js/auth.js"></script>
+<script>
 
-<!-- Логика -->
-<script src="js/permissions.js"></script>
+const slides=document.querySelectorAll(".hero img");
+
+let current=0;
+
+setInterval(()=>{
+
+slides[current].classList.remove("active");
+
+current=(current+1)%slides.length;
+
+slides[current].classList.add("active");
+
+},30000);
+
+function updateClock(){
+
+const now=new Date();
+
+clock.textContent=now.toLocaleString("ru-RU",{
+timeZone:"Europe/Madrid",
+weekday:"long",
+day:"numeric",
+month:"long",
+hour:"2-digit",
+minute:"2-digit"
+});
+
+}
+
+updateClock();
+
+setInterval(updateClock,1000);
+
+musicBtn.onclick=()=>{
+
+musicBtn.textContent=musicBtn.textContent==="🎵"?"🔇":"🎵";
+
+};
+
+</script>
+
 <script src="js/router.js"></script>
 
 </body>

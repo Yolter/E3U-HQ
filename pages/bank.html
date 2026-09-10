@@ -8,6 +8,7 @@
 <link rel="stylesheet" href="../css/layout.css">
 <link rel="stylesheet" href="../css/style.css">
 </head>
+
 <body>
 
 <div class="layout">
@@ -46,32 +47,31 @@
 </div>
 
 <div class="card">
+<row justify=between align=center>
+  <title size=md>Неделя 1</title>
+  <title size=md><text id="progressText" inline>0 / 96</text></title>
+</row>
 
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-<h2>Неделя 1</h2>
-<h3 id="progressText">0 / 96</h3>
-</div>
-
-<div class="progress">
-<div id="progressBar" style="width:0%"></div>
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>Игроки</h2>
-
-<div id="playerList"></div>
-
+<box background="#1a1a1a" radius=full height=10>
+<box id="progressBar" background="#f0c541" radius=full height="100%" width="0%"></box>
+</box>
 </div>
 
 <div class="card">
 
-<h2>История</h2>
+<row justify=between align=center>
+  <title size=md>Игроки</title>
 
-<div id="history"></div>
+  <button id="refreshPlayers" variant=outline size=sm>Обновить</button>
+</row>
 
+<div id="playersList"></div>
+
+</div>
+
+<div class="card">
+<title size=md>История</title>
+<div id="historyList"></div>
 </div>
 
 </main>
@@ -83,27 +83,28 @@
 import { db } from "../js/firebase.js";
 
 import {
+collection,
 doc,
 getDoc,
-updateDoc,
-collection,
 getDocs,
+updateDoc,
+setDoc,
+increment,
 addDoc,
 query,
+where,
 orderBy,
-limit,
-serverTimestamp
+limit
 }
-from "https://www.gstatic.com/firebasejs/12.2.1/firebase-firestore.js";
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const PACKAGE=10000000;
-
-const balanceRef=doc(db,"bank_balance","current");
-const cycleRef=doc(db,"bank_cycle","week1");
+const GIVE = 10000000;
 
 async function loadBalance(){
 
-const snap=await getDoc(balanceRef);
+const snap=await getDoc(doc(db,"bank_balance","current"));
+
+if(!snap.exists()) return;
 
 const data=snap.data();
 
@@ -116,49 +117,55 @@ diamonds.textContent=(data.diamonds/1000000)+"M";
 
 async function loadCycle(){
 
-const snap=await getDoc(cycleRef);
+const snap=await getDoc(doc(db,"bank_cycle","week1"));
+
+if(!snap.exists()) return;
 
 const data=snap.data();
 
-progressText.textContent=data.submitted+" / "+data.totalPlayers;
+progressText.textContent=`${data.submitted}/${data.totalPlayers}`;
 
-progressBar.style.width=(data.submitted/data.totalPlayers*100)+"%";
+const percent=(data.submitted/data.totalPlayers)*100;
+
+progressBar.style.width=percent+"%";
 
 }
 
 async function loadPlayers(){
 
-const list=document.getElementById("playerList");
+const list=document.getElementById("playersList");
+
+list.innerHTML="Загрузка...";
+
+const q=query(collection(db,"users"));
+
+const snap=await getDocs(q);
 
 list.innerHTML="";
 
-const users=await getDocs(collection(db,"users"));
+snap.forEach(docSnap=>{
 
-users.forEach(user=>{
-
-const data=user.data();
+const p=docSnap.data();
 
 const row=document.createElement("div");
 
-row.className="active-item";
-
-const btn=document.createElement("button");
-
-btn.className="gold-btn";
-
-btn.textContent="⭕";
-
-btn.onclick=()=>submitResources(user.id,data.name||user.id);
+row.className="playerRow";
 
 row.innerHTML=`
 <div>
-<b>${data.name||user.id}</b>
-<br>
-<small>${data.role||""}</small>
+<b>${p.nickname}</b><br>
+<small>${p.rank}</small>
 </div>
+
+<label>
+<input type="checkbox" ${p.bankSubmitted?"checked":""}>
+Сдал
+</label>
 `;
 
-row.appendChild(btn);
+const check=row.querySelector("input");
+
+check.onchange=()=>togglePlayer(docSnap.id,p.bankSubmitted);
 
 list.appendChild(row);
 
@@ -166,61 +173,81 @@ list.appendChild(row);
 
 }
 
-async function submitResources(id,name){
+async function togglePlayer(id,current){
 
-const balance=(await getDoc(balanceRef)).data();
+const userRef=doc(db,"users",id);
+
+await updateDoc(userRef,{
+bankSubmitted:!current
+});
+
+const balanceRef=doc(db,"bank_balance","current");
+const cycleRef=doc(db,"bank_cycle","week1");
+
+if(!current){
 
 await updateDoc(balanceRef,{
-cargo:balance.cargo+PACKAGE,
-ammo:balance.ammo+PACKAGE,
-metal:balance.metal+PACKAGE,
-diamonds:balance.diamonds+PACKAGE
+cargo:increment(GIVE),
+ammo:increment(GIVE),
+metal:increment(GIVE),
+diamonds:increment(GIVE)
 });
-
-const cycle=(await getDoc(cycleRef)).data();
 
 await updateDoc(cycleRef,{
-submitted:cycle.submitted+1
+submitted:increment(1)
 });
 
-await addDoc(collection(db,"bank_logs"),{
-player:name,
-time:serverTimestamp(),
-package:PACKAGE
+await addDoc(collection(db,"bank_history"),{
+player:id,
+action:"submit",
+time:Date.now()
 });
 
-loadBalance();
+}else{
 
-loadCycle();
+await updateDoc(balanceRef,{
+cargo:increment(-GIVE),
+ammo:increment(-GIVE),
+metal:increment(-GIVE),
+diamonds:increment(-GIVE)
+});
 
-loadHistory();
+await updateDoc(cycleRef,{
+submitted:increment(-1)
+});
+
+}
+
+await loadBalance();
+await loadCycle();
+await loadPlayers();
+await loadHistory();
 
 }
 
 async function loadHistory(){
 
-const box=document.getElementById("history");
+const box=document.getElementById("historyList");
 
 box.innerHTML="";
 
-const q=query(collection(db,"bank_logs"),orderBy("time","desc"),limit(10));
+const q=query(
+collection(db,"bank_history"),
+orderBy("time","desc"),
+limit(20)
+);
 
-const logs=await getDocs(q);
+const snap=await getDocs(q);
 
-logs.forEach(log=>{
+snap.forEach(d=>{
 
-const data=log.data();
+const data=d.data();
 
 const item=document.createElement("div");
 
-item.className="active-item";
-
 item.innerHTML=`
-<div>
-<b>${data.player}</b>
-<br>
+<b>${data.player}</b><br>
 <small>Сдал недельный пакет</small>
-</div>
 `;
 
 box.appendChild(item);
@@ -228,6 +255,8 @@ box.appendChild(item);
 });
 
 }
+
+refreshPlayers.onclick=loadPlayers;
 
 loadBalance();
 loadCycle();
