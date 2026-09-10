@@ -1,1 +1,93 @@
-<div class='card'><h2>Truck</h2><p>Каркас готов.</p></div>
+<section class="panel">
+  <h2>🚛 Truck Center</h2>
+
+  <div class="card" style="margin-bottom:15px;">
+    <h3>🚛 Водитель дня</h3>
+    <h1 id="driverName">—</h1>
+    <small>Сегодня тащит фуру</small>
+  </div>
+
+  <div class="card" style="margin-bottom:15px;">
+    <h3>📊 Статистика</h3>
+    <p>Рейсов сегодня: <b id="truckRuns">0</b></p>
+    <p>Опозданий: <b id="lateCount">0</b></p>
+  </div>
+
+  <div class="card">
+    <h3>🎮 Быстрые действия</h3>
+
+    <button id="chooseDriver">🎲 Выбрать водителя дня</button>
+    <button id="addRun">➕ Засчитать рейс</button>
+    <button id="lateBtn">😂 Опоздал на рейс</button>
+    <button id="resetTruck">♻ Сбросить день</button>
+  </div>
+</section>
+
+<script>
+(() => {
+
+const driver=document.getElementById("driverName");
+const runs=document.getElementById("truckRuns");
+const late=document.getElementById("lateCount");
+
+let data=JSON.parse(localStorage.getItem("truckData")||'{"driver":"—","runs":0,"late":0}');
+
+function save(){
+    localStorage.setItem("truckData",JSON.stringify(data));
+}
+
+function draw(){
+    driver.textContent=data.driver;
+    runs.textContent=data.runs;
+    late.textContent=data.late;
+}
+
+draw();
+
+document.getElementById("chooseDriver").onclick=()=>{
+
+    const users=loadUsers().filter(u=>u.role!=="Founder");
+
+    if(users.length===0){
+        alert("Добавь бойцов в штаб.");
+        return;
+    }
+
+    const pick=users[Math.floor(Math.random()*users.length)];
+
+    data.driver=pick.name;
+
+    save();
+    draw();
+
+};
+
+document.getElementById("addRun").onclick=()=>{
+
+    data.runs++;
+
+    save();
+    draw();
+
+};
+
+document.getElementById("lateBtn").onclick=()=>{
+
+    data.late++;
+
+    save();
+    draw();
+
+};
+
+document.getElementById("resetTruck").onclick=()=>{
+
+    data={driver:"—",runs:0,late:0};
+
+    save();
+    draw();
+
+};
+
+})();
+</script>
