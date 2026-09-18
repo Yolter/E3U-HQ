@@ -1,0 +1,5 @@
+/*
+  SPA fallback for Cloudflare Pages / Netlify: every non-asset path is served by
+  index.html so React Router handles /bank, /forum/:id, etc. on a hard refresh.
+*/
+/*    /index.html   200

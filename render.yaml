@@ -1,0 +1,34 @@
+# Render blueprint for the E3U HQ backend (free plan).
+# Deploy: push to GitHub → Render → "New +" → "Blueprint" → pick this repo.
+services:
+  - type: web
+    name: e3u-hq-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn server:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.9"
+      - key: MONGO_URL
+        sync: false # MongoDB Atlas SRV connection string
+      - key: DB_NAME
+        value: e3u_hq
+      - key: CORS_ORIGINS
+        sync: false # e.g. https://e3u-hq.pages.dev
+      - key: APP_URL
+        sync: false # e.g. https://e3u-hq.pages.dev
+      - key: COOKIE_SAMESITE
+        value: none
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4o-mini
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false # "E3U HQ <hq@yourdomain.com>" (verified Resend domain)
+      - key: EMAIL_FROM_NAME
+        value: E3U HQ
